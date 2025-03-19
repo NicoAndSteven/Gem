@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.coco.mygem.entity.User;
 import com.coco.mygem.mapper.UserMapper;
+import com.coco.mygem.utils.UuidGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -28,42 +29,41 @@ public class UserServiceImpl implements UserService {
     public User findByUsername(String username) {
         return userMapper.findByUsername(username);
     }
-
+    //用于判断用户注册时号码是否在库中存在
     public User findUserByPhoneNumber(String phoneNumber) {
         QueryWrapper<User> wrapper = new QueryWrapper<>();
         wrapper.eq("phone_number", phoneNumber);
         return userMapper.selectOne(wrapper);
     }
 
-
+    //登录校验
     @Override
-    public boolean validateUser(String username, String rawPassword) throws Exception {
-        User user = userMapper.findByUsername(username);
-
+    public boolean validateUser(String phoneNumber, String rawPassword) throws Exception {
+        User user = findUserByPhoneNumber(phoneNumber);
         if (user == null) {
             throw new Exception("用户不存在");
         }
         // 校验输入的密码是否与数据库中存储的加密密码匹配
         return passwordEncoder.matches(rawPassword, user.getPassword());
     }
+    //注册校验
     @Override
-    public boolean registerUser(String username, String rawPassword, String email, String mobile) {
-        if (findByUsername(username) != null) {
+    public boolean registerUser(String username, String rawPassword, String email, String phoneNumber) {
+        if (findUserByPhoneNumber(phoneNumber) != null) {
             return false;
         }
-
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
         // 创建新用户对象
         User newUser = new User();
         newUser.setUsername(username);
         newUser.setEmail(email);
-
-
+        newUser.setPhoneNumber(phoneNumber);
+        newUser.setUuid(UuidGenerator.simpleUuid());
         // 使用 BCrypt 加密密码
         String encodedPassword = passwordEncoder.encode(rawPassword);
         newUser.setPassword(encodedPassword);
-
         // 插入数据库（需要确保 UserMapper 有对应的插入方法）
-        return userMapper.insertUser(newUser) > 0;
+        return userMapper.insert(newUser) > 0;
     }
 
 }

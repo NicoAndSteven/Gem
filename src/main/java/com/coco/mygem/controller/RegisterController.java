@@ -29,14 +29,14 @@ public class RegisterController {
         String username = request.get("username");
         String password = request.get("password");
         String email = request.get("email");
-        String mobile = request.get("mobile");
+        String phoneNumber = request.get("phoneNumber");
 
         if (username == null || password == null) {
             return ResponseEntity.badRequest().body("用户名和密码不能为空");
         }
 
         try {
-            if (userService.registerUser(username, password,email,mobile)) {
+            if (userService.registerUser(username, password,email,phoneNumber)) {
                 return ResponseEntity.ok().body("注册成功");
             }
             return ResponseEntity.badRequest().body("用户名已存在");
