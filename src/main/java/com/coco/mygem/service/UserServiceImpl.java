@@ -49,10 +49,10 @@ public class UserServiceImpl implements UserService {
     //注册校验
     @Override
     public boolean registerUser(String username, String rawPassword, String email, String phoneNumber) {
-        if (findUserByPhoneNumber(phoneNumber) != null) {
-            return false;
-        }
-        QueryWrapper<User> wrapper = new QueryWrapper<>();
+//        if (findUserByPhoneNumber(phoneNumber) != null) {
+//            return false;
+//        }
+//        QueryWrapper<User> wrapper = new QueryWrapper<>();
         // 创建新用户对象
         User newUser = new User();
         newUser.setUsername(username);

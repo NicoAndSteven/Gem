@@ -3,10 +3,7 @@ package com.coco.mygem.controller;
 import com.coco.mygem.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -18,11 +15,12 @@ import java.util.Map;
  */
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/gem")
 public class RegisterController {
 
     @Autowired
     private UserService userService;
+    @CrossOrigin(origins = "http://localhost:5173")
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Map<String, String> request) {
@@ -37,7 +35,7 @@ public class RegisterController {
 
         try {
             if (userService.registerUser(username, password,email,phoneNumber)) {
-                return ResponseEntity.ok().body("注册成功");
+                return ResponseEntity.ok().body(Map.of("message", "注册成功"));
             }
             return ResponseEntity.badRequest().body("用户名已存在");
         } catch (Exception e) {

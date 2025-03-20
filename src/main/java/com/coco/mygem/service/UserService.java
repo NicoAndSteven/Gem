@@ -10,6 +10,6 @@ import com.coco.mygem.entity.User;
  */
 public interface UserService {
     User findByUsername(String username);
-    boolean validateUser(String username, String rawPassword) throws Exception;
+    boolean validateUser(String phoneNumber, String rawPassword) throws Exception;
     boolean registerUser(String username, String rawPassword, String email, String phoneNumber);
 }
