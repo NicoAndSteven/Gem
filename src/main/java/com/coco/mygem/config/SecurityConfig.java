@@ -32,7 +32,7 @@ public class SecurityConfig {
 
                 // 3. 配置权限
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/gem/login", "/gem/register").permitAll()
+                        .requestMatchers("/gem/","/gem/login", "/gem/register").permitAll()
                         .anyRequest().authenticated()
                 )
         ;
