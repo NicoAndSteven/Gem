@@ -1,7 +1,7 @@
 package com.coco.mygem.config;
 
 import org.springframework.context.annotation.Configuration;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -11,12 +11,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    //给登录和注册两个接口放行
+
+    @Autowired
+    private JwtFilter jwtFilter;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -26,16 +30,21 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 // 配置请求授权
                 .formLogin(AbstractHttpConfigurer::disable)
+                // 配置会话管理
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                // 2. 添加 JWT 过滤器
-                .addFilterBefore(new JwtFilter(), UsernamePasswordAuthenticationFilter.class)
+                // 添加 JWT 过滤器
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
 
-                // 3. 配置权限
+                // 配置权限
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/gem/","/gem/login", "/gem/register").permitAll()
+                        .requestMatchers("/", "/error").permitAll()
+                        .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
+                        .requestMatchers("/api/**").authenticated()
                         .anyRequest().authenticated()
-                )
-        ;
+                );
+
         return http.build();
     }
 
@@ -43,13 +52,15 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList("http://localhost:5173")); // 允许的前端地址
+        config.setAllowedOrigins(Arrays.asList("http://localhost:5173")); 
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("*"));
-        config.setAllowCredentials(true); // 允许携带凭证（如 cookies）
+        config.setExposedHeaders(Arrays.asList("Authorization"));
+        config.setAllowCredentials(true);
+        config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config); // 应用到所有路径
+        source.registerCorsConfiguration("/**", config);
         return source;
     }
 }
