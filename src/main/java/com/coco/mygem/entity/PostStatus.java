@@ -7,7 +7,7 @@ public enum PostStatus {
     APPROVE("2", "审批中"),
     FINISH("3", "已结束"),
     REJECT("4", "被退回"),
-    CANCEL("9", "已作废");
+    CANCEL("5", "已作废");
 
     private String code;
     private String name;
