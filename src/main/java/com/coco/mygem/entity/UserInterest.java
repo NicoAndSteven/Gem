@@ -6,40 +6,23 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
 
-/**
- * @Author: MOHE
- * @Description: 用户实体
- * @Date: 2025/3/13 16:17
- * @Version: 1.0
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("users")
-public class User {
+@TableName("user_interests")
+public class UserInterest {
     @TableId(type = IdType.AUTO)
+    private Long id;
+    
     private Long userId;
     
-    private String username;
+    private String tag;
     
-    private String password;
-    
-    private String email;
-    
-    private String role;
-    
-    private String skillTags;
-    
-    private Integer creditScore;
-    
-    private Long balance;
+    private Double weight;
     
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
     
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
-    
-    @TableLogic
-    private Integer deleted;
-}
+} 
