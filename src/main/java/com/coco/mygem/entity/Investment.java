@@ -2,9 +2,13 @@ package com.coco.mygem.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -21,10 +25,11 @@ public class Investment {
     private String status;
     
     // 投资时间
-    private Long createTime;
+    @TableField(fill = FieldFill.INSERT)
+    private LocalDateTime createTime;
     
     // 确认时间
-    private Long confirmTime;
+    private LocalDateTime confirmTime;
     
     // 投资回报率（百分比）
     private Integer returnRate;

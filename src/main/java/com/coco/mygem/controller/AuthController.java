@@ -1,8 +1,10 @@
 package com.coco.mygem.controller;
 
+import com.coco.mygem.dto.ApiResponse;
 import com.coco.mygem.dto.LoginRequest;
 import com.coco.mygem.dto.RegisterRequest;
 import com.coco.mygem.entity.User;
+import com.coco.mygem.exception.UserAlreadyExistException;
 import com.coco.mygem.security.JwtTokenProvider;
 import com.coco.mygem.service.UserService;
 import com.coco.mygem.util.LogUtil;
@@ -31,45 +33,60 @@ public class AuthController {
     private UserService userService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                    loginRequest.getUsername(),
-                    loginRequest.getPassword()
-                )
-            );
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            String jwt = tokenProvider.generateToken(authentication);
-
-            Map<String, String> response = new HashMap<>();
-            response.put("token", jwt);
-            response.put("type", "Bearer");
-
-            LogUtil.info("用户登录成功: " + loginRequest.getUsername());
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            LogUtil.error("用户登录失败: " + loginRequest.getUsername(), e);
-            return ResponseEntity.badRequest().body("用户名或密码错误");
+    public ResponseEntity<ApiResponse> login(@RequestBody LoginRequest loginRequest) {
+        // 参数验证
+        if (loginRequest.getUsername() == null || loginRequest.getUsername().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("用户名不能为空"));
         }
+        if (loginRequest.getPassword() == null || loginRequest.getPassword().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("密码不能为空"));
+        }
+        
+        // 登录验证
+        Authentication authentication = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(
+                loginRequest.getUsername(),
+                loginRequest.getPassword()
+            )
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = tokenProvider.generateToken(authentication);
+
+        Map<String, String> tokenData = new HashMap<>();
+        tokenData.put("token", jwt);
+        tokenData.put("type", "Bearer");
+
+        LogUtil.info("用户登录成功: " + loginRequest.getUsername());
+        return ResponseEntity.ok(ApiResponse.success("登录成功", tokenData));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest registerRequest) {
-        try {
-            User user = new User();
-            user.setUsername(registerRequest.getUsername());
-            user.setPassword(registerRequest.getPassword());
-            user.setEmail(registerRequest.getEmail());
-
-            User registeredUser = userService.register(user);
-            LogUtil.info("新用户注册成功: " + registeredUser.getUsername());
-            return ResponseEntity.ok(registeredUser);
-        } catch (Exception e) {
-            LogUtil.error("用户注册失败", e);
-            return ResponseEntity.badRequest().body(e.getMessage());
+    public ResponseEntity<ApiResponse> register(@RequestBody RegisterRequest registerRequest) {
+        // 参数验证
+        if (registerRequest.getUsername() == null || registerRequest.getUsername().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("用户名不能为空"));
         }
+        if (registerRequest.getPassword() == null || registerRequest.getPassword().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("密码不能为空"));
+        }
+        if (registerRequest.getEmail() == null || registerRequest.getEmail().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("邮箱不能为空"));
+        }
+
+        // 创建用户并注册
+        User user = new User();
+        user.setUsername(registerRequest.getUsername());
+        user.setPassword(registerRequest.getPassword());
+        user.setEmail(registerRequest.getEmail());
+
+        User registeredUser = userService.register(user);
+        LogUtil.info("新用户注册成功: " + registeredUser.getUsername());
+
+        // 隐藏敏感字段
+        registeredUser.setPassword(null);
+        
+        return ResponseEntity.ok(ApiResponse.success("注册成功", registeredUser));
     }
 }
 

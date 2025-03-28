@@ -2,7 +2,7 @@ package com.coco.mygem.utils;
 
 /**
  * @Author: MOHE
- * @Description: TODO
+ * @Description: Uid生成工具集
  * @Date: 2025/3/19 16:53
  * @Version: 1.0
  */

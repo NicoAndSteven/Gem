@@ -5,6 +5,8 @@ import com.coco.mygem.entity.Investment;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -21,7 +23,7 @@ public interface InvestmentMapper extends BaseMapper<Investment> {
     // 更新投资状态
     @Update("UPDATE investments SET status = #{status}, confirm_time = #{confirmTime} " +
             "WHERE investment_id = #{investmentId}")
-    int updateStatus(Long investmentId, String status, Long confirmTime);
+    int updateStatus(Long investmentId, String status, LocalDateTime confirmTime);
     
     // 查询用户对特定项目的投资
     @Select("SELECT * FROM investments WHERE user_id = #{userId} AND post_id = #{postId}")

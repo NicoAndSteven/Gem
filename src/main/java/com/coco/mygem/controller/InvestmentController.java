@@ -1,5 +1,6 @@
 package com.coco.mygem.controller;
 
+import com.coco.mygem.dto.ApiResponse;
 import com.coco.mygem.entity.Investment;
 import com.coco.mygem.entity.InvestmentStatus;
 import com.coco.mygem.service.InvestmentService;
@@ -17,63 +18,68 @@ public class InvestmentController {
     private InvestmentService investmentService;
 
     @PostMapping
-    public ResponseEntity<Investment> createInvestment(@RequestBody Investment investment) {
-        return ResponseEntity.ok(investmentService.createInvestment(investment));
+    public ResponseEntity<ApiResponse> createInvestment(@RequestBody Investment investment) {
+        Investment created = investmentService.createInvestment(investment);
+        return ResponseEntity.ok(ApiResponse.success("投资创建成功", created));
     }
 
     @GetMapping("/{investmentId}")
-    public ResponseEntity<Investment> getInvestment(@PathVariable Long investmentId) {
+    public ResponseEntity<ApiResponse> getInvestment(@PathVariable Long investmentId) {
         Investment investment = investmentService.getInvestmentById(investmentId);
-        return investment != null ? ResponseEntity.ok(investment) : ResponseEntity.notFound().build();
+        return ResponseEntity.ok(ApiResponse.success(investment));
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Investment>> getUserInvestments(@PathVariable Long userId) {
-        return ResponseEntity.ok(investmentService.getInvestmentsByUserId(userId));
+    public ResponseEntity<ApiResponse> getUserInvestments(@PathVariable Long userId) {
+        List<Investment> investments = investmentService.getInvestmentsByUserId(userId);
+        return ResponseEntity.ok(ApiResponse.success(investments));
     }
 
     @GetMapping("/post/{postId}")
-    public ResponseEntity<List<Investment>> getPostInvestments(@PathVariable Long postId) {
-        return ResponseEntity.ok(investmentService.getInvestmentsByPostId(postId));
+    public ResponseEntity<ApiResponse> getPostInvestments(@PathVariable Long postId) {
+        List<Investment> investments = investmentService.getInvestmentsByPostId(postId);
+        return ResponseEntity.ok(ApiResponse.success(investments));
     }
 
     @PutMapping("/{investmentId}/status")
-    public ResponseEntity<Void> updateInvestmentStatus(
+    public ResponseEntity<ApiResponse> updateInvestmentStatus(
             @PathVariable Long investmentId,
             @RequestParam InvestmentStatus status) {
         boolean success = investmentService.updateInvestmentStatus(investmentId, status);
-        return success ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
+        return ResponseEntity.ok(ApiResponse.success("投资状态更新为: " + status));
     }
 
     @PutMapping("/{investmentId}/confirm")
-    public ResponseEntity<Void> confirmInvestment(@PathVariable Long investmentId) {
+    public ResponseEntity<ApiResponse> confirmInvestment(@PathVariable Long investmentId) {
         boolean success = investmentService.confirmInvestment(investmentId);
-        return success ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
+        return ResponseEntity.ok(ApiResponse.success("投资已确认"));
     }
 
     @PutMapping("/{investmentId}/cancel")
-    public ResponseEntity<Void> cancelInvestment(@PathVariable Long investmentId) {
+    public ResponseEntity<ApiResponse> cancelInvestment(@PathVariable Long investmentId) {
         boolean success = investmentService.cancelInvestment(investmentId);
-        return success ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
+        return ResponseEntity.ok(ApiResponse.success("投资已取消"));
     }
 
     @GetMapping("/post/{postId}/total")
-    public ResponseEntity<Long> getTotalInvestment(@PathVariable Long postId) {
-        return ResponseEntity.ok(investmentService.getTotalInvestment(postId));
+    public ResponseEntity<ApiResponse> getTotalInvestment(@PathVariable Long postId) {
+        Long total = investmentService.getTotalInvestment(postId);
+        return ResponseEntity.ok(ApiResponse.success(total));
     }
 
     @GetMapping("/check")
-    public ResponseEntity<Boolean> hasInvested(
+    public ResponseEntity<ApiResponse> hasInvested(
             @RequestParam Long userId,
             @RequestParam Long postId) {
-        return ResponseEntity.ok(investmentService.hasInvested(userId, postId));
+        boolean hasInvested = investmentService.hasInvested(userId, postId);
+        return ResponseEntity.ok(ApiResponse.success(hasInvested));
     }
 
     @GetMapping("/user/{userId}/post/{postId}")
-    public ResponseEntity<Investment> getUserInvestment(
+    public ResponseEntity<ApiResponse> getUserInvestment(
             @PathVariable Long userId,
             @PathVariable Long postId) {
         Investment investment = investmentService.getUserInvestment(userId, postId);
-        return investment != null ? ResponseEntity.ok(investment) : ResponseEntity.notFound().build();
+        return ResponseEntity.ok(ApiResponse.success(investment));
     }
 } 

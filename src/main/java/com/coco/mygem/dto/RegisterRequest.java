@@ -2,7 +2,7 @@ package com.coco.mygem.dto;
 
 /**
  * @Author: MOHE
- * @Description: TODO
+ * @Description: 传输请求的注册信息
  * @Date: 2025/3/26 16:40
  * @Version: 1.0
  */
