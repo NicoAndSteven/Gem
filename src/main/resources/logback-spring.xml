@@ -52,6 +52,14 @@
         </encoder>
     </appender>
 
+    <!-- 默认配置 -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="SYSTEM_FILE"/>
+        <appender-ref ref="ERROR_FILE"/>
+        <appender-ref ref="BUSINESS_FILE"/>
+    </root>
+
     <!-- 开发环境 -->
     <springProfile name="dev">
         <root level="INFO">
